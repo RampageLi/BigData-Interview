@@ -44,3 +44,33 @@
   3. 外键：InnoDB 支持
   4. MVCC：InnoDB 支持
   5. 备份：InnoDB 支持在线热备份
+
+## 7 drop、truncate、delete
+
+**执行速度**
+
+drop > truncate > delete
+
+**DELETE**
+
+属于数据库操作语言 DML，走事务；
+
+不会释放空间，不加 where 在 MyISAM会释放空间，加 `optimize table $table_name` 会释放空间；
+
+一行一行执行操作，记录在 redo log 和 undo log。
+
+**truncate**
+
+属于数据库定义语言 DDL，不走事务；
+
+立即生效，无法找回，会立即释放磁盘空间；
+
+清除表的内容。
+
+**drop**
+
+属于数据库定义语言 DDL；
+
+立即生效，无法找回，立即释放磁盘空间；
+
+删除整个表。
