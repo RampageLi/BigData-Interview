@@ -62,7 +62,7 @@
 
 **概述**
 
-shuffle write 将数据存储在 blockManager，数据位置辕信息上报到 mapOutTrack；
+shuffle write 将数据存储在 blockManager，数据位置元信息上报到 mapOutTrack；
 
 下一个 stage 根据数据位置元信息拉去上个 stage 的输出数据，进行 shuffle read。
 
