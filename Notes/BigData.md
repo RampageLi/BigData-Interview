@@ -62,9 +62,110 @@
 
 **概述**
 
-shuffle write 将数据存储在 blockManager，数据位置元信息上报到 mapOutTrack；
+shuffle write 将数据存储在 **blockManager**，数据位置元信息上报到 **mapOutPutTracker**；
 
-下一个 stage 根据数据位置元信息拉去上个 stage 的输出数据，进行 shuffle read。
+下一个 stage 根据数据位置元信息拉去上个 stage 的输出数据，进行 shuffle read；
 
+shuffle manager 负责 shuffle 的执行。
 
+**Hash based shuffle**
 
+小文件数目 = M * R；
+
+产生很多写小文件对象、读小文件对象；
+
+JVM 堆内存对象过多造成 GC，GC 无法解决，造成 OOM；
+
+**Hash based shuffle （合并机制）**
+
+小文件数目 = C * R；
+
+**Sort shuffle （普通运行机制）**
+
+小文件数目 = M * 2；
+
+map task 计算结果写入内存结构（map or array）；
+
+到达阈值溢写到磁盘，溢写前进行排序分区；
+
+分批（batch）的形式进行溢写（默认是10000条）；
+
+多个小文件合并成大文件，并生成索引文件。
+
+**Sort shuffle （byPass 运行机制）**
+
+shuffleMapTask 的数量小于默认值200，开启 byPass 运行机制；
+
+因为数据量比较小，不需要进行 sort。
+
+## 3 Hive 相关知识
+
+### 3.1 Hive 调优
+
+**使用 `group by` 代替 `count(distinct col)`**
+
+distinct 会将 col 列所有数据保存至内存中，可能发生 OOM。
+
+**避免使用 select ***
+
+占用程序资源，造成资源浪费。
+
+**处理空值**
+
+直接过滤；
+
+给空值赋予随机数。
+
+**不要在 join 后加 where**
+
+两表连接时，采用 `谓词下推` 技术，将 where 放到子查询进行。
+
+**开启并行执行**
+
+set hive.exec.parallel=true。
+
+**使用 tez 引擎**
+
+hive.execution.engine = tez。
+
+**采用本地模式**
+
+hive.exec.mode.local.auto=true。
+
+**使用严格模式**
+
+避免 where 扫描所有分区；
+
+order by 排序后所有数据会发往同一个 reducer 进行处理，必须加 limit。
+
+**合理设置 map 和 reduce 数**
+
+map 启动、初始化时间大于逻辑处理时间，造成资源浪费；
+
+单个 map 记录过多，耗时大；
+
+reduce 过多会造成小文件多，启动、初始化时间过长。
+
+## 4 Hadoop 相关知识
+
+### 4.1 MapReduce 连接两表
+
+在 map 阶段，根据数据来源给每条数据打标，如下所示：
+
+```java
+context.write(new Text(id), new Text("#" + city));
+```
+
+在 reduce 阶段，根据打的标签放到不同 list：
+
+```java
+if (value.startsWith("#")) {
+	value = value.substring(1);
+	list1.add(value);
+} else if (value.startsWith("$")) {
+	value = value.substring(1);
+	list2.add(value);
+}
+```
+
+两表相同 key 数据进行笛卡尔积。
