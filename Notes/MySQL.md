@@ -6,6 +6,8 @@
 + 全称为 balance tree
 + 一个节点的 key 从左到右非递减排序
 + 如果某个指针的左右相邻 key 分别是 key_1 和 key_2，且不为 null，则该指针指向节点的所有 key 大于等于 key_2 且小于等于 key_2
++ 索引文件存放在磁盘，避免磁盘的随机I/O
++ 对于范围查询和有序遍历，B+ Tree 只需扫描叶子节点，B Tree 只能中序遍历。
 
 ## 2 与红黑树进行比较
 
@@ -39,11 +41,11 @@
 + InnoDB 和 MyISAM 的比较
 
   1. 行级锁：InnoDB 支持，MyISAM不支持
-
-  2. 崩溃后修复：MyISAM 执行速度更快，修复过程可能导致数据丢失
+2. 崩溃后修复：MyISAM 执行速度更快，修复过程可能导致数据丢失
   3. 外键：InnoDB 支持
   4. MVCC：InnoDB 支持
   5. 备份：InnoDB 支持在线热备份
+  6. MYISAM 的 B+ Tree 索引叶子节点 data 域存放的是数据记录的地址；InnoDB 数据文件本身就是索引文件，叶节点 data 域保存完整的数据记录。
 
 ## 7 drop、truncate、delete
 

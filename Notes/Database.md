@@ -68,3 +68,114 @@ where
 **DCL**
 
 授权、回滚、提交。
+
+## 9 索引优点
+
+保证每行唯一性；
+
+提升检索速度；
+
+避免排序和临时表（B+ Tree 有序）；
+
+顺序IO；
+
+加速表连接。
+
+## 10 索引缺点
+
+增、删、改时，索引需要动态维护；
+
+索引需要占物理空间；
+
+创建、维护索引需要时间。
+
+## 11 索引使用原则
+
+经常查询的列；
+
+WHERE 语句中出现的列；
+
+需要排序的列；
+
+特大型表不适合索引（创建、维护成本）；
+
+经常连接的列。
+
+## 12 覆盖索引
+
+```sql
+select 
+	username
+	,age 
+from 
+	user 
+where 
+	username = 'Java' 
+	and age = 22
+```
+
+查询数据都在叶子节点，无需回表。
+
+## 13 索引如何提升查询速度
+
+MySQL 的基本存储结构是页；
+
+不同数据页构成双向链表，每个数据页的记录是单向链表；
+
+采用非主键查询时，首先定位页，然后查找相应记录；
+
+采用索引后，进行二分查找，降低时间复杂度。
+
+## 14 索引的最左前缀原则
+
+如果联合索引设置为 `index_name (num,name,age)` ，那么当查询的条件有为:num / (num AND name) / (num AND name AND age) 时，索引生效。
+
+```sql
+select * from user where name=xx and city=xx ; ／／可以命中索引
+select * from user where name=xx ; // 可以命中索引
+select * from user where city=xx ; // 无法命中索引 
+```
+
+## 15 冗余索引
+
+index(a, b) 和 index(a)，index(a) 就是冗余索引。
+
+## 16 如何创建索引 
+
+```sql
+# 主键索引
+ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` )  
+
+------------------------二级索引------------------------
+# 唯一索引
+ALTER TABLE `table_name` ADD UNIQUE ( `column` ) 
+
+# 普通索引
+ALTER TABLE `table_name` ADD INDEX index_name ( `column` )
+
+# 全文索引
+ALTER TABLE `table_name` ADD FULLTEXT ( `column`) 
+
+# 多列索引
+ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+```
+
+## 17 聚集索引和非聚集索引
+
+**聚集索引**
+
+数据和索引结构放在一起（如主键索引）；
+
+查询速度快；
+
+依赖于有序数据，如果无序，需要在插入时排序；
+
+更新代价大。
+
+**非聚集索引**
+
+数据和索引结构分开存放；
+
+叶子节点存放主键；
+
+因为叶子节点不存放数据，更新代价小；
