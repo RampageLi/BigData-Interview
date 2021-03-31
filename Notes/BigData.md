@@ -169,3 +169,65 @@ if (value.startsWith("#")) {
 ```
 
 两表相同 key 数据进行笛卡尔积。
+
+### 4.2 HDFS 写数据流程
+
+客户端通过 DFS 向 NameNode 请求上传文件，NameNode 检查文件和父目录是否存在；
+
+NN 返回可以上传；
+
+请求第一个 Block 传到哪几个 DataNode；
+
+返回 DN 节点；
+
+通过 FSDataOutputStream 请求 dn1、dn2、dn3 建立通信管道；
+
+dn1、dn2、dn3 逐个响应；
+
+dn1 收到 Packet 依次传给 dn2、dn3；
+
+继续请求 DataNode。
+
+### 4.3 HDFS读数据流程
+
+客户端通过 DFS 向 NN 请求下载；
+
+NN 通过查询元数据返回对应 DN；
+
+请求 DN 读取数据；
+
+DN 开始传输，以 Packet 为单位接受，先本地缓存，然后写入目标文件。
+
+### 4.4 NameNode 工作机制
+
+NN 创建或者加载编辑日志 Edits 和 镜像文件 FSimage 到内存；
+
+客户端对元数据进行增、删、改；
+
+NN 记录到Edits，在内存中进行增、删、改；
+
+2NN 询问是否 CheckPoint，执行 CheckPoint（Edits 满了或者时间到了）；
+
+NN 滚动正在写的 Edits；
+
+滚动前的 Edits 和 FSimage 拷贝到 2NN 进行合并；
+
+生成新的 FSimage fsimage.chkpoint；
+
+拷贝 fsimage.chkpoint 到 NN，重命名为 fsimage。
+
+### 4.5 DataNode 工作机制
+
+数据块在 DN 上以文件形式存储在磁盘，包括数据本身和元数据；
+
+DN 启动后向 NN 注册，周期性上报所有块信息；
+
+每 3 秒一次心跳，心跳返回 NN 对 DN 的命令，如果 10 分钟没收到心跳，则放弃该节点； 
+
+### 4.6 副本节点选择
+
+第一个副本放在 Client 所在节点；
+
+第二个副本和第一个副本位于同一机架，随机节点；
+
+第三个副本位于不同机架，随机节点。
