@@ -102,6 +102,14 @@ shuffleMapTask 的数量小于默认值200，开启 byPass 运行机制；
 
 ![img](https://camo.githubusercontent.com/c1e2fca4b7ee8067bf6229509bc329570fdc7722cf3cb36782c73358b9d56d10/68747470733a2f2f67697465652e636f6d2f68656962616979696e672f426967446174612d4e6f7465732f7261772f6d61737465722f70696374757265732f737061726b2de99b86e7bea4e6a8a1e5bc8f2e706e67)
 
+### 2.3 Spark on Yarn 模式 Client 和 Cluster 的区别
+
+Cluster 适合于生产环境，Client 适用于交互和测试；
+
+Cluster 的 Application Master 运行 driver，申请资源，监督作业；
+
+Client 的 Application Master 只请求 executor，Client 进行调度。
+
 ## 3 Hive 相关知识
 
 ### 3.1 Hive 调优
