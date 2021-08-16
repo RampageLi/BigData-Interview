@@ -182,3 +182,14 @@ ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` 
 叶子节点存放主键；
 
 因为叶子节点不存放数据，更新代价小；
+
+## 18 一条语句的执行过程
+
+**整体流程**
+
+连接器 -> 查询缓存（8.0开始已经删除） -> 分析器 -> 优化器 -> 执行器
+
+**更新语句流程**
+
+redo log (prepare) -> binlog -> redo log (commit)
+

@@ -40,12 +40,13 @@
 
 + InnoDB 和 MyISAM 的比较
 
-  1. 行级锁：InnoDB 支持，MyISAM不支持
+
+1. 行级锁：InnoDB 支持，MyISAM不支持
 2. 崩溃后修复：MyISAM 执行速度更快，修复过程可能导致数据丢失
-  3. 外键：InnoDB 支持
-  4. MVCC：InnoDB 支持
-  5. 备份：InnoDB 支持在线热备份
-  6. MYISAM 的 B+ Tree 索引叶子节点 data 域存放的是数据记录的地址；InnoDB 数据文件本身就是索引文件，叶节点 data 域保存完整的数据记录。
+3. 外键：InnoDB 支持
+4. MVCC：InnoDB 支持
+5. 备份：InnoDB 支持在线热备份
+6. MYISAM 的 B+ Tree 索引叶子节点 data 域存放的是数据记录的地址；InnoDB 数据文件本身就是索引文件，叶节点 data 域保存完整的数据记录。
 
 ## 7 drop、truncate、delete
 
